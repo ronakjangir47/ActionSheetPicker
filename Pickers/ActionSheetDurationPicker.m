@@ -92,7 +92,8 @@
     if (self.onActionSheetDone) {
         self.onActionSheetDone(self, self.selectedInterval);
     } else if ([target respondsToSelector:action]) {
-        objc_msgSend(target, action, self.selectedInterval, origin);
+        id (*response)(id, SEL, id, id) = (id (*)(id, SEL, id, id)) objc_msgSend;
+        response(target, action, self.selectedInterval, origin);
     } else {
         NSAssert(NO, @"Invalid target/action ( %s / %s ) combination used for ActionSheetPicker", object_getClassName(target), sel_getName(action));
     }

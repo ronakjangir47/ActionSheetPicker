@@ -72,29 +72,29 @@
     picker.showsSelectionIndicator = YES;
     [picker addLabel:self.bigUnitString forComponent:(self.bigUnitDigits - 1) forLongestString:nil];
     [picker addLabel:self.smallUnitString forComponent:(self.bigUnitDigits + self.smallUnitDigits - 1) forLongestString:nil];
-    
+
     NSInteger unitSubtract = 0;
     NSInteger currentDigit = 0;
-    
+
     for (int i = 0; i < self.bigUnitDigits; ++i) {
         NSInteger factor = (int)pow((double)10, (double)(self.bigUnitDigits - (i+1)));
         currentDigit = (( self.selectedBigUnit - unitSubtract ) / factor )  ;
         [picker selectRow:currentDigit inComponent:i animated:NO];
         unitSubtract += currentDigit * factor;
     }
-    
+
     unitSubtract = 0;
-    
+
     for (NSInteger i = self.bigUnitDigits; i < self.bigUnitDigits + self.smallUnitDigits; ++i) {
         NSInteger factor = (NSInteger)pow((double)10, (double)(self.bigUnitDigits + self.smallUnitDigits - (i+1)));
         currentDigit = (( self.selectedSmallUnit - unitSubtract ) / factor )  ;
         [picker selectRow:currentDigit inComponent:i animated:NO];
         unitSubtract += currentDigit * factor;
     }
-    
+
     //need to keep a reference to the picker so we can clear the DataSource / Delegate when dismissing
     self.pickerView = picker;
-    
+
     return picker;
 }
 
@@ -109,10 +109,13 @@
         smallUnits += [picker selectedRowInComponent:i] * (NSInteger)pow((double)10, (double)((picker.numberOfComponents - i - 1)));
 
         //sending three objects, so can't use performSelector:
-    if ([target respondsToSelector:action])
-        objc_msgSend(target, action, @(bigUnits), @(smallUnits), origin);
-    else
+    if ([target respondsToSelector:action]) {
+        id (*response)(id, SEL, id, id, id) = (id (*)(id, SEL, id, id, id)) objc_msgSend;
+        response(target, action, @(bigUnits), @(smallUnits), origin);
+    }
+    else {
         NSAssert(NO, @"Invalid target/action ( %s / %s ) combination used for ActionSheetPicker", object_getClassName(target), sel_getName(action));
+    }
 }
 
 #pragma mark -
@@ -129,7 +132,7 @@
         return 10;
     }
     if (component == self.bigUnitDigits)
-        return self.smallUnitMax / (int)pow((double)10, (double)(self.smallUnitDigits - 1)) + 1; 
+        return self.smallUnitMax / (int)pow((double)10, (double)(self.smallUnitDigits - 1)) + 1;
     return 10;
 }
 

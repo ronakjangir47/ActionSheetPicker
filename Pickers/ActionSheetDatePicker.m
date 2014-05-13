@@ -58,8 +58,8 @@
     return self;
 }
 
-+ (id)showPickerWithTitle:(NSString *)title 
-           datePickerMode:(UIDatePickerMode)datePickerMode selectedDate:(NSDate *)selectedDate                                                                             
++ (id)showPickerWithTitle:(NSString *)title
+           datePickerMode:(UIDatePickerMode)datePickerMode selectedDate:(NSDate *)selectedDate
                  target:(id)target action:(SEL)action origin:(id)origin {
     ActionSheetDatePicker *picker = [[ActionSheetDatePicker alloc] initWithTitle:title datePickerMode:datePickerMode selectedDate:selectedDate target:target action:action origin:origin];
     [picker showActionSheetPicker];
@@ -89,10 +89,10 @@
 
     [datePicker setDate:self.selectedDate animated:NO];
     [datePicker addTarget:self action:@selector(eventForDatePicker:) forControlEvents:UIControlEventValueChanged];
-    
+
     //need to keep a reference to the picker so we can clear the DataSource / Delegate when dismissing (not used in this picker, but just in case somebody uses this as a template for another picker)
     self.pickerView = datePicker;
-    
+
     return datePicker;
 }
 
@@ -101,7 +101,8 @@
     if (self.onActionSheetDone) {
         self.onActionSheetDone(self, self.selectedDate);
     } else if ([target respondsToSelector:action]) {
-        objc_msgSend(target, action, self.selectedDate, origin);
+        id (*response)(id, SEL, id, id) = (id (*)(id, SEL, id, id)) objc_msgSend;
+        response(target, action, self.selectedDate, origin);
     } else {
         NSAssert(NO, @"Invalid target/action ( %s / %s ) combination used for ActionSheetPicker", object_getClassName(target), sel_getName(action));
     }
@@ -129,7 +130,7 @@
     NSAssert([self.pickerView respondsToSelector:@selector(setDate:animated:)], @"Bad pickerView for ActionSheetDatePicker, doesn't respond to setDate:animated:");
     NSDictionary *buttonDetails = [self.customButtons objectAtIndex:index];
     NSDate *itemValue = [buttonDetails objectForKey:@"buttonValue"];
-    UIDatePicker *picker = (UIDatePicker *)self.pickerView;    
+    UIDatePicker *picker = (UIDatePicker *)self.pickerView;
     [picker setDate:itemValue animated:YES];
     [self eventForDatePicker:picker];
 }
