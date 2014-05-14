@@ -72,7 +72,11 @@
 
 - (void)notifyTarget:(id)target didSucceedWithAction:(SEL)action origin:(id)origin {
     if ([target respondsToSelector:action])
-        objc_msgSend(target, action, self.selectedDate, origin);
+    {
+        //objc_msgSend(target, action, self.selectedDate, origin);
+        id (*response)(id, SEL, id, id) = (id (*)(id, SEL, id, id)) objc_msgSend;
+        response(target, action, self.selectedDate, origin);
+    }
     else
         NSAssert(NO, @"Invalid target/action ( %s / %s ) combination used for ActionSheetPicker", object_getClassName(target), (char *)action);
 }
